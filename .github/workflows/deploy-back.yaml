@@ -31,7 +31,7 @@ jobs:
         id: check_vercel_json
         run: |
           JSON="${{ fromJson(steps.send_post_request.outputs.response).data.TARGET_VERCEL_JSON }}"
-          if echo "$JSON" | grep -q 'version'; then
+          if [ -n "$JSON" ]; then
             echo "vercel_json_present=true" >> $GITHUB_OUTPUT
           else
             echo "vercel_json_present=false" >> $GITHUB_OUTPUT
