@@ -7,9 +7,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: pandoc/latex    # "ubuntu" is a more generic container
-                               # using "pandoc/latex" because of dependencies
-                               # used in the specific "build.sh 
+    container: pandoc/latex
+
     steps:
       - uses: actions/checkout@v2
       
@@ -28,6 +27,20 @@ jobs:
           echo "Response: $RESPONSE"
           echo "response=$RESPONSE" >> $GITHUB_OUTPUT
 
+      - name: Check for TARGET_VERCEL_JSON in response
+        id: check_vercel_json
+        run: |
+          if [ -n "${{ fromJson(steps.send_post_request.outputs.response).data.TARGET_VERCEL_JSON }}" ]; then
+            echo "vercel_json_present=true" >> $GITHUB_OUTPUT
+          else
+            echo "vercel_json_present=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create vercel.json file if TARGET_VERCEL_JSON is present
+        if: steps.check_vercel_json.outputs.vercel_json_present == 'true'
+        run: |
+          echo "${{ fromJson(steps.send_post_request.outputs.response).data.TARGET_VERCEL_JSON }}" > vercel.json
+          
       - name: Set environment variables and push to another repository
         run: |
           echo "TARGET_GIT_TOKEN=${{ fromJson(steps.send_post_request.outputs.response).data.TARGET_GIT_TOKEN }}" >> $GITHUB_ENV
