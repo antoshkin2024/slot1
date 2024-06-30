@@ -24,6 +24,10 @@ const processQueue = () => {
   /**
    * { projectId: 'plan@github' | 'gant@github', state: 'RUNTIME' }
    */
+  console.log('process.env.SAFE_URL')
+  console.log(process.env.SAFE_URL)
+  console.log('process.env')
+  console.log(process.env)
   axios.post(`${process.env.SAFE_URL}/safe/get`, req.body)
     .then(response => {
       res.json(response.data);
