@@ -4,14 +4,40 @@ on:
   push:
     branches: [ master ]
 
+permissions:
+  pull-requests: write
+  issues: write
+  repository-projects: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     container: pandoc/latex
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get WIRE_URL
+        id: get_wire_url 
+        uses: "artanty/shared-secrets@master"
+
+      - name: Log the wire URL
+        run: echo "The wire URL is ${{ steps.get_wire_url.outputs.wire_url }}"
+
+      - name: Use Custom Action
+        uses: "artanty/shared-secrets@master"
+        env:
+          MY_CUSTOM_VAR: ${{ secrets.MY_CUSTOM_VAR }}
+
+      - name: Print Custom Variable
+        run: echo "The value of MY_CUSTOM_VAR is ${{ env.MY_CUSTOM_VAR }}"
+        env:
+          MY_CUSTOM_VAR: ${{ env.MY_CUSTOM_VAR }}
       
+
+
+
       - name: Extract part of repository name
         id: extract_repo_part
         run: |
@@ -20,6 +46,12 @@ jobs:
 
       - name: Send POST request
         id: send_post_request
+        # run: |
+        #   RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
+        #   -d "{\"projectId\":\"${{ steps.extract_repo_part.outputs.repo_part }}@github\",\"state\":\"DEPLOY\"}" \
+        #   ${{ secrets.SAFE_URL }})
+        #   echo "Response: $RESPONSE"
+        #   echo "response=$RESPONSE" >> $GITHUB_OUTPUT
         run: |
           RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
           -d "{\"projectId\":\"${{ steps.extract_repo_part.outputs.repo_part }}@github\",\"state\":\"DEPLOY\"}" \
