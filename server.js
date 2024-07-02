@@ -44,7 +44,7 @@ const validateRequest = (req, res, next) => {
   }
 
   const { projectId, state } = req.body;
-  if (state !== 'RUNTIME') {
+  if (state !== 'RUNTIME' || state !== 'DEPLOY') {
     return res.status(400).json({ error: 'Invalid payload' });
   }
 
