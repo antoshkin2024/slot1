@@ -36,18 +36,18 @@ jobs:
 
       - name: Send POST request
         id: send_post_request
-        run: |
-          RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
-          -d "{\"projectId\":\"${{ steps.extract_repo_part.outputs.repo_part }}@github\",\"state\":\"DEPLOY\"}" \
-          ${{ secrets.SAFE_URL }})
-          echo "Response: $RESPONSE"
-          echo "response=$RESPONSE" >> $GITHUB_OUTPUT
         # run: |
         #   RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
         #   -d "{\"projectId\":\"${{ steps.extract_repo_part.outputs.repo_part }}@github\",\"state\":\"DEPLOY\"}" \
-        #   ${{ steps.get_wire_url.outputs.wire_url }})
+        #   ${{ secrets.SAFE_URL }})
         #   echo "Response: $RESPONSE"
         #   echo "response=$RESPONSE" >> $GITHUB_OUTPUT
+        run: |
+          RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
+          -d "{\"projectId\":\"${{ steps.extract_repo_part.outputs.repo_part }}@github\",\"state\":\"DEPLOY\"}" \
+          ${{ steps.get_wire_url.outputs.wire_url }})
+          echo "Response: $RESPONSE"
+          echo "response=$RESPONSE" >> $GITHUB_OUTPUT
 
       - name: Check for TARGET_VERCEL_JSON in response
         id: check_vercel_json
